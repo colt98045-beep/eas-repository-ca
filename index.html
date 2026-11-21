@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>EAS Repository Canada</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#ef4444">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  :root { --bg:#070b14; --surface:#0f1623; --surface-2:#1a2332; --border:rgba(255,255,255,.08); --text:#f1f5f9; --muted:#94a3b8; --accent:#ef4444; --amber:#f59e0b; --radius:12px; }
+  body.theme-light { --bg:#f8fafc; --surface:#fff; --surface-2:#f1f5f9; --border:#e2e8f0; --text:#0f172a; --muted:#64748b; --accent:#dc2626; }
+  body.theme-midnight { --bg:#020617; --surface:#0f172a; --surface-2:#1e293b; --border:#334155; --text:#e2e8f0; --accent:#38bdf8; }
+  body.theme-forest { --bg:#052e16; --surface:#14532d; --surface-2:#166534; --border:#15803d; --text:#dcfce7; --accent:#4ade80; }
+  body.theme-amber { --bg:#1c1917; --surface:#292524; --surface-2:#44403c; --border:#57534e; --text:#fafaf9; --accent:#f59e0b; }
+  body.theme-purple { --bg:#1e1b4b; --surface:#312e81; --surface-2:#3730a3; --border:#4f46e5; --text:#e0e7ff; --accent:#c084fc; }
+  body.theme-ocean { --bg:#0c1929; --surface:#132f4c; --surface-2:#1e4976; --border:#2196f3; --text:#e3f2fd; --accent:#29b6f6; }
+  body.theme-sunset { --bg:#1a0f0a; --surface:#2d1b14; --surface-2:#4a2c20; --border:#ff6b35; --text:#fff3e0; --accent:#ff8a50; }
+  body.theme-neon { --bg:#0a0a12; --surface:#12121f; --surface-2:#1e1e30; --border:#ff00ff; --text:#f0f0ff; --accent:#00ffff; }
+  body.theme-slate { --bg:#0f1419; --surface:#1c252e; --surface-2:#2a3642; --border:#64748b; --text:#e2e8f0; --accent:#94a3b8; }
+  body.theme-hacker { --bg:#000; --surface:#050505; --surface-2:#0a0a0a; --border:#0f0; --text:#0f0; --muted:#0a0; --accent:#0f0; font-family:"Share Tech Mono",monospace; }
+  body.theme-hacker::after { content:""; position:fixed; inset:0; background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,0,.03) 3px); pointer-events:none; z-index:9998; }
+  body.theme-rwb { --bg:#000; --surface:#120000; --surface-2:#220000; --border:#f00; --text:#fff; --muted:#f88; --accent:#f00; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:Inter,system-ui,sans-serif; background:var(--bg); color:var(--text); transition:background .3s,color .3s; }
+  header { background:rgba(15,22,35,.85); backdrop-filter:blur(12px); border-bottom:1px solid var(--border); padding:16px 24px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:40; }
+  .brand h1 { margin:0; font-size:1.2rem; font-weight:700; }
+  .brand h1 span { color:var(--accent); }
+  .header-meta { display:flex; align-items:center; gap:10px; }
+  .badge { background:var(--surface-2); border:1px solid var(--border); padding:4px 12px; border-radius:999px; font-weight:600; }
+  .badge.hot { background:var(--accent); color:#fff; animation:pulse 1.8s infinite; }
+  @keyframes pulse { 50%{transform:scale(1.06)} }
+  .icon-btn { background:transparent; border:1px solid var(--border); width:36px; height:36px; border-radius:10px; color:var(--text); cursor:pointer; }
+  .clocks { background:var(--surface); border-bottom:1px solid var(--border); padding:10px 24px; display:flex; gap:24px; justify-content:center; flex-wrap:wrap; }
+  .clock { text-align:center; }
+  .clock.local { outline:1px solid var(--accent); border-radius:8px; padding:2px 8px; }
+  .clock .label { font-size:.62rem; font-weight:600; letter-spacing:.06em; color:var(--muted); text-transform:uppercase; }
+  .clock .time { font-size:1.1rem; font-weight:600; font-variant-numeric:tabular-nums; }
+  .tabs { background:var(--surface); border-bottom:1px solid var(--border); padding:0 24px; display:flex; flex-wrap:wrap; }
+  .tab { background:none; border:none; padding:13px 16px; color:var(--muted); cursor:pointer; font-weight:500; border-bottom:2px solid transparent; }
+  .tab.active { color:var(--text); border-bottom-color:var(--accent); }
+  .controls { background:var(--surface); padding:12px 24px; display:flex; gap:8px; flex-wrap:wrap; align-items:center; border-bottom:1px solid var(--border); }
+  input,select,button { font-family:inherit; border-radius:8px; border:1px solid var(--border); background:var(--surface-2); color:var(--text); padding:7px 12px; }
+  button.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
+  #main { max-width:1120px; margin:0 auto; padding:20px; }
+  .alert { background:var(--surface); border:1px solid var(--border); border-left:4px solid var(--accent); border-radius:12px; padding:15px 18px; margin-bottom:10px; }
+  .empty { text-align:center; padding:50px 20px; color:var(--muted); }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><h1>EAS <span>REPOSITORY CANADA</span></h1></div>
+  <div class="header-meta"><div class="badge" id="badge">0</div><span id="status"></span></div>
+</header>
+<div class="controls">
+  <button class="primary" onclick="load()">Refresh</button>
+</div>
+<div id="main"><div id="alerts"></div></div>
+<script>
+async function load() {
+  try {
+    const res = await fetch("/api/canada");
+    const data = await res.json();
+    document.getElementById("badge").textContent = data.length;
+    document.getElementById("status").textContent = new Date().toLocaleTimeString();
+    document.getElementById("alerts").innerHTML = data.length ? data.map(a => `<div class="alert"><strong>${a.type}</strong> · ${a.severity}<br><small>${(a.translation||"").slice(0,200)}</small></div>`).join("") : "<div class=\"empty\">No active Canadian alerts</div>";
+  } catch(e) {
+    document.getElementById("status").textContent = "Offline";
+  }
+}
+load();
+setInterval(load, 30000);
+</script>
+</body>
+</html>
