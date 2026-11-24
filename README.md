@@ -5,69 +5,73 @@
 > **Temporary notice (since 24/11/2026):** The Canada EAS API is currently down or degraded. We are investigating. **Do not rely on this site for emergency alerts right now.** Keep your phone's emergency alerts turned on, and check [Alert Ready](https://www.alertready.ca), [Environment Canada weather alerts](https://weather.gc.ca), or your local TV and radio for current warnings. Updates are on the [status page](https://eas-launcher.colt98045.workers.dev/status).
 <!-- /TEMP-OUTAGE-NOTICE -->
 
-A local, open-source dashboard for monitoring Canadian weather and emergency alerts from Environment Canada / Meteorological Service of Canada (MSC).
+[![CI](https://github.com/colt98045-beep/eas-repository-ca/actions/workflows/ci.yml/badge.svg)](https://github.com/colt98045-beep/eas-repository-ca/actions/workflows/ci.yml)
+[![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/)
+[![Status: beta](https://img.shields.io/badge/status-v1.0.0--beta-orange.svg)](CHANGELOG.md)
 
-It runs entirely on your machine, proxies the public GeoMet OGC API Features endpoint, and presents alerts in a clean interface with filtering, notifications, history, and more.
+A local, open-source dashboard for Canadian weather and emergency alerts from Environment Canada / Meteorological Service of Canada (MSC).
 
-**Status:** v1.0.0-beta — Canadian edition. Core features working; bilingual support and province filtering still improving.
+It runs on your own machine, proxies the public GeoMet OGC API, and shows alerts with filtering, notifications, history and a national radar loop. A hosted Cloudflare Worker serves the same dashboard.
 
-## Screenshots
-
-<!-- Replace with actual screenshots -->
-
-![Alerts list](https://via.placeholder.com/800x450.png?text=Canadian+Alerts+Screenshot)
+**Status:** v1.0.0-beta. Live status for the hosted site: [status page](https://eas-launcher.colt98045.workers.dev/status).
 
 ## Features
+
 - Live Environment Canada / MSC weather alerts (GeoMet)
-- Province filtering
-- Desktop notifications
+- Province filtering, alert history and desktop notifications
 - National radar loop (Environment Canada)
-- Multiple themes
-- Alert history
-- PWA support
-- 100% local — no accounts or API keys required
+- Multiple themes and PWA support
+- Runs locally with no accounts or API keys
+- Hosted Worker with `/privacy` (English and French), a maintenance overlay and an announcement banner
+
+## Architecture
+
+- `eas_monitor.py` — local Python server that proxies public GeoMet feeds and serves the dashboard.
+- `src/index.js` — Cloudflare Worker that serves the dashboard and proxies `/api/canada` and `/api/active`. It also writes visit logs to a shared access-log database. Logging is best-effort and must not change API responses.
+
+The hosted dashboard is at [eas-repository-ca.colt98045.workers.dev](https://eas-repository-ca.colt98045.workers.dev/).
 
 ## Requirements
-- Python 3.8 or newer
-- Internet connection
-- Modern browser
 
-## Quick Start
+- Python 3.8 or newer
+- An internet connection
+- A modern browser
+
+## Quick start
+
 ```bash
 git clone https://github.com/colt98045-beep/eas-repository-ca.git
 cd eas-repository-ca
 python eas_monitor.py
 ```
-Open http://localhost:8080
 
-Default password: `eas` (change in Settings)
+Open <http://localhost:8080> and log in with the default password `eas`. Change it in Settings.
 
-## Attribution & Data Sources
+Worker tests:
+
+```bash
+for t in tests/*.test.mjs; do node "$t"; done
+```
+
+## Deployment
+
+The local app is intended to run on your machine. The hosted site is the `eas-repository-ca` Worker (`src/index.js`). CI never deploys; deploys are manual. The privacy policy at `/privacy` is generated from the shared policy in the launcher repository.
+
+The login screen is a convenience lock, not real authentication. If you put the dashboard on the public internet, protect it with an access layer. See [SECURITY.md](SECURITY.md).
+
+## Attribution and data sources
+
 - Environment Canada / Meteorological Service of Canada (MSC)
-- GeoMet OGC API Features: https://api.weather.gc.ca/collections/weather-alerts/items
+- GeoMet OGC API Features: <https://api.weather.gc.ca/collections/weather-alerts/items>
 - MSC Datamart CAP feeds
 
-This project is not affiliated with Environment Canada, MSC, or the Government of Canada.
+This project is not affiliated with Environment Canada, MSC, or the Government of Canada. Data is proxied and displayed locally. Please respect upstream terms of service.
 
-Data is proxied and displayed locally. Please respect upstream terms of service.
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md). Please follow the [Code of Conduct](CODE_OF_CONDUCT.md). Report security issues privately as described in [SECURITY.md](SECURITY.md). Changes are tracked in [CHANGELOG.md](CHANGELOG.md).
 
 ## License
+
 Licensed under the [Apache License 2.0](LICENSE). Copyright 2026 Colt.
-
-Copyright 2026 Colt
-
-## Hosted Cloudflare Worker
-
-The hosted Canada site is the `eas-repository-ca` Worker. `src/index.js` serves the dashboard assets and proxies `/api/canada` and `/api/active` from Environment Canada GeoMet. It also writes visit logs to the shared `ACCESS_LOG` D1 database, including the full client IP (`CF-Connecting-IP`) next to its salted hash (migration `schema/migrations/0002_add_ip.sql`; 30-day retention, pruned by the launcher). The IP hash salt is the Worker secret `ACCESS_LOG_SALT` (same value as the launcher and US Workers). Logging is best-effort and must not change API responses.
-
-## Privacy
-
-The privacy policy is served at `/privacy` (`privacy.html`, allowlisted in `.assetsignore`) and linked from the footer and the login screen. It is generated from `eas-launcher/privacy/policy.html` by `eas-launcher/scripts/sync-privacy.mjs`; edit it there, not here. Effective date 24/11/2026.
-
-## CI
-
-### Lockout reasons
-
-The lockout overlay is client-side (`index.html` polls the launcher's `/api/maintenance?site=ca`) and shows the reason set in the launcher admin: ⚠️ Outage (red), 🔧 Maintenance (amber, also the default for older settings), ⬆️ Update (blue), or ℹ️ custom text (purple, escaped).
-
-GitHub Actions (`.github/workflows/ci.yml`) runs on every push and pull request: Python compile check, manifest and script syntax, Worker route tests (mocked GeoMet), access-log and privacy tests, and a credential-free `wrangler deploy --dry-run`. It does not deploy; deploys stay manual. Dependabot keeps the Actions versions current.

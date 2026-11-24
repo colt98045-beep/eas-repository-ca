@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/colt98045-beep/eas-repository-ca/blob/main/SECURITY.md
+    about: Please don't post vulnerability details in a public issue. See SECURITY.md.
+  - name: Status page
+    url: https://eas-launcher.colt98045.workers.dev/status
+    about: Live status for the hosted EAS sites and APIs.
+  - name: Questions about Environment Canada / GeoMet APIs
+    url: https://api.weather.gc.ca/
+    about: Upstream data and API questions belong to Environment Canada.

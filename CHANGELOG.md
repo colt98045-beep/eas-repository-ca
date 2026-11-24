@@ -1,0 +1,40 @@
+# Changelog
+
+All notable changes to EAS Repository Canada are documented here.
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+Dates are DD/MM/YYYY.
+
+## [Unreleased]
+
+## 24/11/2026
+
+### Added
+- Temporary README notice that the hosted Canada API is down or degraded
+  (marked `TEMP-OUTAGE-NOTICE` so it can be removed later). Docs only.
+- Maintenance overlay shows the lockout reason (Outage, Maintenance, Update or
+  Other) with its colour and icon. Covered by an overlay test in CI.
+- Tab icon (inline `data:` SVG) on the dashboard and privacy pages. Service
+  worker cache `eas-ca-v5`.
+- CI (syntax, Worker route tests, access-log and privacy tests, Wrangler
+  dry-run) and Dependabot for Actions.
+- Low-risk security headers on every response.
+- `/privacy` page (shared EAS privacy policy) with a full French version
+  (Politique de confidentialité) and language links. Service worker cache
+  `eas-ca-v4`.
+- Access log rows include the full client IP (`CF-Connecting-IP`) next to
+  `ip_hash`. Falls back until migration `0002_add_ip.sql` is applied.
+- Worker entry so page visits can be logged to the shared access log. The
+  GeoMet APIs are unchanged.
+- Client-side maintenance lockout overlay, controlled from the EAS launcher.
+- Dismissible announcement banner from the EAS launcher.
+- Apache 2.0 `LICENSE`.
+
+### Changed
+- Removed the automatic deploy-lock script (auto deploy lockout cancelled).
+  The reason overlay was kept.
+
+## 20/11/2026 — 1.0.0-beta
+
+### Added
+- Canadian edition: Environment Canada GeoMet proxy and a Canadianized
+  dashboard with province filtering and Canadian radar.
