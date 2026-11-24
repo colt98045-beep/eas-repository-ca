@@ -42,6 +42,14 @@ export async function hashIp(ip, salt) {
   return hex.slice(0, 12);
 }
 
+// Full client IP as Cloudflare saw it (CF-Connecting-IP only; never a
+// client-supplied X-Forwarded-For). At most 45 chars (IPv6 max), else null.
+export function clientIp(request) {
+  const ip = (request.headers.get("CF-Connecting-IP") || "").trim();
+  if (!ip || ip.length > 45 || !/^[0-9A-Fa-f:.]+$/.test(ip)) return null;
+  return ip;
+}
+
 export function truncateUa(value) {
   if (typeof value !== "string") return "";
   return value.slice(0, 200);
@@ -80,22 +88,26 @@ export async function writeAccessLog(env, request, response, { site, gate = null
   const ipHash = await hashIp(requestIp(request), env.ACCESS_LOG_SALT);
   const ua = truncateUa(request.headers.get("user-agent") || "");
   const country = (request.cf && request.cf.country) || request.headers.get("CF-IPCountry") || null;
-  await env.ACCESS_LOG.prepare(
-    `INSERT INTO access_logs (ts, site, method, path, status, country, ip_hash, user_agent, gate)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-  )
-    .bind(
-      now,
-      site,
-      request.method || "GET",
-      normalizePath(url.pathname),
-      response.status,
-      country,
-      ipHash,
-      ua || null,
-      gate,
+  const base = [now, site, request.method || "GET", normalizePath(url.pathname), response.status, country, ipHash];
+  const tail = [ua || null, gate];
+  try {
+    await env.ACCESS_LOG.prepare(
+      `INSERT INTO access_logs (ts, site, method, path, status, country, ip_hash, ip, user_agent, gate)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     )
-    .run();
+      .bind(...base, clientIp(request), ...tail)
+      .run();
+  } catch (err) {
+    // Before migration 0002_add_ip.sql is applied the ip column does not
+    // exist yet; keep logging without it so deploy order does not matter.
+    if (!/no column named ip|has no column|no such column/i.test(String((err && err.message) || err))) throw err;
+    await env.ACCESS_LOG.prepare(
+      `INSERT INTO access_logs (ts, site, method, path, status, country, ip_hash, user_agent, gate)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    )
+      .bind(...base, ...tail)
+      .run();
+  }
   return true;
 }
 
