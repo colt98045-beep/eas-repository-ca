@@ -58,3 +58,7 @@ The hosted Canada site is the `eas-repository-ca` Worker. `src/index.js` serves 
 ## Privacy
 
 The privacy policy is served at `/privacy` (`privacy.html`, allowlisted in `.assetsignore`) and linked from the footer and the login screen. It is generated from `eas-launcher/privacy/policy.html` by `eas-launcher/scripts/sync-privacy.mjs`; edit it there, not here. Effective date 24/11/2026.
+
+## CI
+
+GitHub Actions (`.github/workflows/ci.yml`) runs on every push and pull request: Python compile check, manifest and script syntax, Worker route tests (mocked GeoMet), access-log and privacy tests, and a credential-free `wrangler deploy --dry-run`. It does not deploy; deploys stay manual. Dependabot keeps the Actions versions current.

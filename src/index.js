@@ -23,9 +23,31 @@ const app = {
   },
 };
 
+// Low-risk headers on every response. No CSP here yet: the dashboard uses
+// inline scripts and third-party map/tile/font hosts.
+export const SECURITY_HEADERS = {
+  "X-Content-Type-Options": "nosniff",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+  "Strict-Transport-Security": "max-age=31536000",
+};
+
+export function withSecurityHeaders(response) {
+  if (!response || response.status === 101) return response;
+  let out;
+  try {
+    out = new Response(response.body, response);
+  } catch {
+    return response;
+  }
+  for (const [name, value] of Object.entries(SECURITY_HEADERS)) {
+    if (!out.headers.has(name)) out.headers.set(name, value);
+  }
+  return out;
+}
+
 export default {
   async fetch(request, env, ctx) {
-    const response = await app.fetch(request, env);
+    const response = withSecurityHeaders(await app.fetch(request, env));
     try {
       logRequest(ctx, env, request, response, { site: "ca" });
     } catch {

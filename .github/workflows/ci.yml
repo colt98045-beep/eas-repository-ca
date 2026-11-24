@@ -1,0 +1,62 @@
+name: CI
+
+# Checks only. This repo is deployed by hand (National Cyber Director), not from Actions.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Worker, frontend and privacy checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Python compile check
+        run: python -m py_compile eas_monitor.py
+
+      - name: Validate manifest.json
+        run: node -e "JSON.parse(require('fs').readFileSync('manifest.json', 'utf8'))"
+
+      - name: Check sw.js and Worker syntax
+        run: |
+          node --check sw.js
+          for f in src/*.js; do node --check "$f"; done
+
+      - name: Check inline script syntax in index.html
+        run: |
+          node -e "
+            const fs = require('fs');
+            const html = fs.readFileSync('index.html', 'utf8');
+            const scripts = [...html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)].map(m => m[1]);
+            fs.writeFileSync('/tmp/inline.js', scripts.join('\n;\n'));
+            console.log('Extracted ' + scripts.length + ' inline script(s)');
+          "
+          node --check /tmp/inline.js
+
+      - name: Worker route tests
+        run: node tests/worker-routes.test.mjs
+
+      - name: Access log tests
+        run: |
+          node tests/access-log.test.mjs
+          node tests/access-log-ip.test.mjs
+
+      - name: Privacy page tests
+        run: node tests/privacy.test.mjs
+
+      - name: Wrangler dry-run build (no credentials)
+        run: npx --yes wrangler deploy --dry-run --outdir /tmp/worker-dry-run
