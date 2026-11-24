@@ -47,7 +47,7 @@ This project is not affiliated with Environment Canada, MSC, or the Government o
 Data is proxied and displayed locally. Please respect upstream terms of service.
 
 ## License
-Apache License 2.0 — see [LICENSE](LICENSE)
+Licensed under the [Apache License 2.0](LICENSE). Copyright 2026 Colt.
 
 Copyright 2026 Colt
 
