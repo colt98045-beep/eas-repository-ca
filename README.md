@@ -1,5 +1,10 @@
 # EAS Repository Canada
 
+<!-- TEMP-OUTAGE-NOTICE -->
+> [!WARNING]
+> **Temporary notice (since 24/11/2026):** The Canada EAS API is currently down or degraded. We are investigating. **Do not rely on this site for emergency alerts right now.** Keep your phone's emergency alerts turned on, and check [Alert Ready](https://www.alertready.ca), [Environment Canada weather alerts](https://weather.gc.ca), or your local TV and radio for current warnings. Updates are on the [status page](https://eas-launcher.colt98045.workers.dev/status).
+<!-- /TEMP-OUTAGE-NOTICE -->
+
 A local, open-source dashboard for monitoring Canadian weather and emergency alerts from Environment Canada / Meteorological Service of Canada (MSC).
 
 It runs entirely on your machine, proxies the public GeoMet OGC API Features endpoint, and presents alerts in a clean interface with filtering, notifications, history, and more.
