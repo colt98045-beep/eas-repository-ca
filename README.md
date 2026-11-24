@@ -54,3 +54,7 @@ Copyright 2026 Colt
 ## Hosted Cloudflare Worker
 
 The hosted Canada site is the `eas-repository-ca` Worker. `src/index.js` serves the dashboard assets and proxies `/api/canada` and `/api/active` from Environment Canada GeoMet. It also writes visit logs to the shared `ACCESS_LOG` D1 database, including the full client IP (`CF-Connecting-IP`) next to its salted hash (migration `schema/migrations/0002_add_ip.sql`; 30-day retention, pruned by the launcher). The IP hash salt is the Worker secret `ACCESS_LOG_SALT` (same value as the launcher and US Workers). Logging is best-effort and must not change API responses.
+
+## Privacy
+
+The privacy policy is served at `/privacy` (`privacy.html`, allowlisted in `.assetsignore`) and linked from the footer and the login screen. It is generated from `eas-launcher/privacy/policy.html` by `eas-launcher/scripts/sync-privacy.mjs`; edit it there, not here. Effective date 24/11/2026.
