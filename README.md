@@ -61,17 +61,8 @@ The privacy policy is served at `/privacy` (`privacy.html`, allowlisted in `.ass
 
 ## CI
 
-### Deploy lockout
+### Lockout reasons
 
-Lock the CA site with reason **Update** while deploying (the lock clears itself after 20 minutes if the unlock never runs, and it never touches a lock set by hand in the launcher admin):
-
-```sh
-export DEPLOY_LOCK_TOKEN=...                 # same value as the eas-launcher Worker secret
-node scripts/deploy-lock.mjs lock            # 1. lock (defaults to --site ca)
-#                                              2. deploy, then check /, /privacy, /api/canada, /api/active
-node scripts/deploy-lock.mjs unlock          # 3. unlock
-```
-
-The lockout overlay is client-side (`index.html` polls the launcher's `/api/maintenance?site=ca`), so the page checks in step 2 still return 200 while locked; the overlay shows **⬆️ Update** in blue. Reasons: ⚠️ Outage (red), 🔧 Maintenance (amber, also the default for older settings), ⬆️ Update (blue), ℹ️ custom text (purple).
+The lockout overlay is client-side (`index.html` polls the launcher's `/api/maintenance?site=ca`) and shows the reason set in the launcher admin: ⚠️ Outage (red), 🔧 Maintenance (amber, also the default for older settings), ⬆️ Update (blue), or ℹ️ custom text (purple, escaped).
 
 GitHub Actions (`.github/workflows/ci.yml`) runs on every push and pull request: Python compile check, manifest and script syntax, Worker route tests (mocked GeoMet), access-log and privacy tests, and a credential-free `wrangler deploy --dry-run`. It does not deploy; deploys stay manual. Dependabot keeps the Actions versions current.

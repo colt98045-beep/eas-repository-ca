@@ -58,12 +58,8 @@ jobs:
       - name: Privacy page tests
         run: node tests/privacy.test.mjs
 
-      - name: Lockout overlay and deploy-lock script tests
-        run: |
-          node tests/maintenance-overlay.test.mjs
-          node --check scripts/deploy-lock.mjs
-          env -u DEPLOY_LOCK_TOKEN node scripts/deploy-lock.mjs lock --optional | grep -q "skipping"
-          grep -q 'const DEFAULT_SITE = "ca";' scripts/deploy-lock.mjs
+      - name: Lockout overlay tests
+        run: node tests/maintenance-overlay.test.mjs
 
       - name: Wrangler dry-run build (no credentials)
         run: npx --yes wrangler deploy --dry-run --outdir /tmp/worker-dry-run
