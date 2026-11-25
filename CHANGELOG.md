@@ -30,6 +30,7 @@ Dates are DD/MM/YYYY.
 - Apache 2.0 `LICENSE`.
 
 ### Changed
+- Removed the temporary README notice that the hosted Canada API was down or degraded. Docs only.
 - Removed the automatic deploy-lock script (auto deploy lockout cancelled).
   The reason overlay was kept.
 
