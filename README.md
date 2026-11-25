@@ -11,6 +11,8 @@ It runs on your own machine, proxies the public GeoMet OGC API, and shows alerts
 
 **Status:** v1.0.0-beta. Live status for the hosted site: [status page](https://eas-launcher.colt98045.workers.dev/status).
 
+**Documentation:** [Project wiki](https://github.com/colt98045-beep/eas-repository-ca/wiki)
+
 ## Features
 
 - Live Environment Canada / MSC weather alerts (GeoMet)

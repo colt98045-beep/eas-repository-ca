@@ -8,6 +8,9 @@ Dates are DD/MM/YYYY.
 
 ## 24/11/2026
 
+### Changed
+- Added a documentation link to the project wiki.
+
 ### Added
 - `NOTICE` file with Apache 2.0 and bilingual Open Government Licence – Canada
   attributions.
