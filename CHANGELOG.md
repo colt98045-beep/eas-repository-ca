@@ -9,6 +9,22 @@ Dates are DD/MM/YYYY.
 ## 24/11/2026
 
 ### Added
+- `NOTICE` file with Apache 2.0 and bilingual Open Government Licence – Canada
+  attributions.
+
+### Changed
+- Bilingual Open Government Licence – Canada credit lines (linking English and
+  French licence pages) and bilingual non-affiliation / unofficial-service / Alert
+  Ready disclaimers on the dashboard footer and radar view, plus `README.md`.
+- Replaced the triband flag-style tab icon with a non-flag alert triangle icon
+  and bumped service worker cache to `eas-ca-v6`.
+- Worker `/api/canada` and `/api/active` now cache GeoMet responses for
+  90 seconds via Cloudflare Cache API (`caches.default`) and isolate memory,
+  send `EASRepositoryCA/1.0` with the repository URL, never forward `no-cache`
+  or `Pragma` upstream, and omit WMS cache-buster query parameters.
+- Synced updated bilingual `/privacy` page with exact D1 retention windows.
+
+### Added
 - Temporary README notice that the hosted Canada API is down or degraded
   (marked `TEMP-OUTAGE-NOTICE` so it can be removed later). Docs only.
 - Maintenance overlay shows the lockout reason (Outage, Maintenance, Update or

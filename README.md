@@ -61,7 +61,9 @@ The login screen is a convenience lock, not real authentication. If you put the 
 - GeoMet OGC API Features: <https://api.weather.gc.ca/collections/weather-alerts/items>
 - MSC Datamart CAP feeds
 
-This project is not affiliated with Environment Canada, MSC, or the Government of Canada. Data is proxied and displayed locally. Please respect upstream terms of service.
+Data source: Environment and Climate Change Canada. Contains information licensed under the [Open Government Licence – Canada](https://open.canada.ca/en/open-government-licence-canada) ([Licence du gouvernement ouvert – Canada](https://ouvert.canada.ca/fr/licence-du-gouvernement-ouvert-canada)).
+
+EAS Repository Canada is an independent project for information only. It is not affiliated with or endorsed by the Government of Canada or Environment and Climate Change Canada (ECCC), and is not an official alerting service. Always follow official sources and [Alert Ready](https://www.alertready.ca/).
 
 ## Contributing
 
